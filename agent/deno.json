@@ -1,0 +1,15 @@
+{
+  "name": "@agent/agent",
+  "version": "0.0.1",
+  "exports": "./mod.ts",
+  "imports": {
+    "@ai-sdk/google": "npm:@ai-sdk/google@^1.2.19",
+    "ai": "npm:ai@^4.3.16",
+    "zod": "npm:zod@^3.25.64"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-slow-types"]
+    }
+  }
+}

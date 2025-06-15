@@ -1,0 +1,14 @@
+{
+  "name": "@agent/tools",
+  "version": "0.0.1",
+  "exports": "./mod.ts",
+  "imports": {
+    "ai": "npm:ai@^4.3.16",
+    "zod": "npm:zod@^3.25.64"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-slow-types"]
+    }
+  }
+}
