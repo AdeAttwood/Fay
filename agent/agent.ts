@@ -4,11 +4,15 @@ import { inferProviderFromEnvironment } from "./provider.ts";
 import tools from "@agent/tools";
 import { type CoreMessage, type CoreUserMessage, streamText } from "ai";
 
+export type NewAgentOptions = {
+  title: string;
+};
+
 export class Agent {
   /**
    * @param session The session to use for the agent.
    */
-  private constructor(private session: Session) {
+  constructor(public readonly session: Session) {
     this.prompt = this.prompt.bind(this);
   }
 
@@ -16,12 +20,20 @@ export class Agent {
    * Creates a new agent.
    * @returns A new agent.
    */
-  public static new() {
+  public static new(options: NewAgentOptions) {
     return new Agent(
-      new Session(inferProviderFromEnvironment(), [
-        { role: "system", content: systemPrompt },
-      ]),
+      new Session(
+        crypto.randomUUID(),
+        new Date().getTime(),
+        options.title,
+        inferProviderFromEnvironment(),
+        [{ role: "system", content: systemPrompt }],
+      ),
     );
+  }
+
+  public saveSession() {
+    this.session.save(`./.git/fay/sessions/${this.session.id}.json`);
   }
 
   /**
@@ -55,7 +67,9 @@ export class Agent {
           }
         }
       },
-      // onFinish: () => {},
+      onFinish: () => {
+        this.saveSession();
+      },
       onError: (error) => {
         throw new Error(
           `Processing error: ${"message" in error ? error.message : "Unknown"}`,

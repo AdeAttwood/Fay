@@ -1,4 +1,5 @@
 import type { CoreMessage, LanguageModel } from "ai";
+import createProvider from "./provider.ts";
 
 type Messages = Array<CoreMessage>;
 
@@ -8,6 +9,9 @@ export class Session {
    * @param messages The messages in the session.
    */
   constructor(
+    public readonly id: string,
+    public readonly createdAt: number,
+    public readonly title: string,
     public readonly model: LanguageModel,
     public readonly messages: Messages = [],
   ) {}
@@ -19,7 +23,13 @@ export class Session {
    */
   public static async load(file: string) {
     const sessionData = JSON.parse(await Deno.readTextFile(file));
-    return new Session(createProvider(sessionData.model), sessionData.messages);
+    return new Session(
+      sessionData.id,
+      sessionData.createdAt,
+      sessionData.title,
+      createProvider(sessionData.model),
+      sessionData.messages,
+    );
   }
 
   /**
@@ -30,6 +40,9 @@ export class Session {
     await Deno.writeTextFile(
       file,
       JSON.stringify({
+        id: this.id,
+        createdAt: this.createdAt,
+        title: this.title,
         model: this.model.modelId,
         messages: this.messages,
       }),
