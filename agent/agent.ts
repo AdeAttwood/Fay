@@ -1,14 +1,21 @@
 import { Session } from "./session.ts";
 import systemPrompt from "./prompt.ts";
-import { createProvider, inferProviderFromEnvironment } from "./provider.ts";
+import { inferProviderFromEnvironment } from "./provider.ts";
 import tools from "@agent/tools";
 import { type CoreMessage, type CoreUserMessage, streamText } from "ai";
 
 export class Agent {
+  /**
+   * @param session The session to use for the agent.
+   */
   private constructor(private session: Session) {
     this.prompt = this.prompt.bind(this);
   }
 
+  /**
+   * Creates a new agent.
+   * @returns A new agent.
+   */
   public static new() {
     return new Agent(
       new Session(inferProviderFromEnvironment(), [
@@ -17,23 +24,11 @@ export class Agent {
     );
   }
 
-  public static async load(file: string) {
-    const sessionData = JSON.parse(await Deno.readTextFile(file));
-    return new Agent(
-      new Session(createProvider(sessionData.model), sessionData.messages),
-    );
-  }
-
-  public async save(file: string) {
-    await Deno.writeTextFile(
-      file,
-      JSON.stringify({
-        model: this.session.model.modelId,
-        messages: this.session.messages,
-      }),
-    );
-  }
-
+  /**
+   * Prompts the agent with a message.
+   * @param content The message to prompt the agent with.
+   * @returns A stream of messages from the agent.
+   */
   public prompt = async function* prompt(this: Agent, content: string) {
     const userMessage: CoreUserMessage = { role: "user", content };
     this.session.messages.push(userMessage);
