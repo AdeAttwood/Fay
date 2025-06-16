@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [ development ]
+  pull_request:
+    branches: [ development ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: '2.x'
+
+      - name: Lint
+        run: deno lint .
+
+      - name: Compile
+        run: deno task compile:cli
