@@ -1,7 +1,7 @@
 import { Session } from "./session.ts";
 import systemPrompt from "./prompt.ts";
 import { inferProviderFromEnvironment } from "./provider.ts";
-import tools from "@agent/tools";
+import tools from "@fay/tools";
 import { type CoreMessage, type CoreUserMessage, streamText } from "ai";
 
 export type NewAgentOptions = {

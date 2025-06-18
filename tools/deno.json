@@ -1,5 +1,5 @@
 {
-  "name": "@agent/tools",
+  "name": "@fay/tools",
   "version": "0.0.1",
   "exports": "./mod.ts",
   "imports": {
