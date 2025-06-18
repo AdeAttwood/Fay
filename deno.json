@@ -1,6 +1,6 @@
 {
   "workspace": ["agent", "cli", "tools"],
   "tasks": {
-    "compile:cli": "deno compile --allow-run --allow-read --allow-write --allow-env --allow-net -o bin/agent ./cli/main.ts"
+    "compile:cli": "deno compile --allow-run --allow-read --allow-write --allow-env --allow-net -o bin/fay ./cli/main.ts"
   }
 }

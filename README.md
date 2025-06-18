@@ -26,5 +26,5 @@ deno task compile:cli
 To run the interactive agent
 
 ```bash
-./bin/agent
+./bin/fay
 ```

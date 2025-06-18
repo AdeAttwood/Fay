@@ -3,7 +3,7 @@ import { Input } from "@cliffy/prompt";
 import { colors } from "@cliffy/ansi/colors";
 import { Command } from "@cliffy/command";
 
-import { Agent } from "@agent/agent";
+import { Agent } from "@fay/agent";
 import { SessionManager } from "./session-manager.ts";
 
 const userHighlight = colors.yellow.bold;
@@ -113,6 +113,8 @@ const run = new Command()
   });
 
 await new Command()
+  .name("fay")
+  .default("run")
   .command("list", list)
   .command("new", newCommand)
   .command("run", run)
