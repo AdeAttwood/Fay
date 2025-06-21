@@ -49,10 +49,9 @@ function printAssistantMessage(message: CoreAssistantMessage) {
 function printToolMessage(message: CoreToolMessage) {
   message.content.forEach((c) => {
     console.log(toolHighlight("┃ TOOL RESULT:"));
-    const stringResult =
-      typeof c.result === "string"
-        ? c.result
-        : JSON.stringify(c.result || "", undefined, 2);
+    const stringResult = typeof c.result === "string"
+      ? c.result
+      : JSON.stringify(c.result || "", undefined, 2);
 
     for (const line of formatContent(stringResult)) {
       console.log(toolHighlight("┃ "), line);
