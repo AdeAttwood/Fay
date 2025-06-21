@@ -4,14 +4,34 @@ import z from "zod";
 export default tool({
   description: "Run a bash shell command",
   parameters: z.object({
-    command: z.string().describe("The command you want to run"),
+    programme: z.string().describe(
+      "The programme to execute (e.g., 'ls', 'pwd')",
+    ),
     args: z
       .array(z.string())
-      .describe("The arguments you want to pass to the command"),
+      .describe(
+        "An array of arguments to pass to the command (e.g., ['-l', '-a'])",
+      ),
   }),
-  execute: async ({ command, args }) => {
-    const cmd = new Deno.Command(command, { args });
-    const { stdout } = await cmd.output();
-    return new TextDecoder().decode(stdout);
+  execute: async ({ programme, args }) => {
+    if (programme.includes(" ")) {
+      return "Programme cannot have spaces it in. Please ensure you use the programme and arguments.";
+    }
+
+    const cmd = new Deno.Command(programme, { args });
+
+    try {
+      const { stdout } = await cmd.output();
+      return new TextDecoder().decode(stdout);
+    } catch (e) {
+      if (typeof e == "object" && e !== null && "code" in e) {
+        switch (e.code) {
+          case "ENOENT":
+            return `The programme '${programme}' is not found`;
+        }
+      }
+
+      return JSON.stringify(e);
+    }
   },
 });
