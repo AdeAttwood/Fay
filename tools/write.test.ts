@@ -1,12 +1,14 @@
 import { assertEquals } from "https://deno.land/std@0.208.0/assert/assert_equals.ts";
-import { tool } from "ai";
 import writeTool from "./write.ts";
 
 Deno.test("Write entire file", async () => {
   const fileName = "test_file.txt";
   const content = "Hello, world!";
 
-  await writeTool.execute({ fileName, content });
+  await writeTool.execute({ fileName, content }, {
+    toolCallId: "write",
+    messages: [],
+  });
 
   const actualContent = await Deno.readTextFile(fileName);
   assertEquals(actualContent, content);
@@ -23,7 +25,10 @@ Deno.test("Write part of file", async () => {
   const offset = 5;
   const length = 7;
 
-  await writeTool.execute({ fileName, content, offset, length });
+  await writeTool.execute({ fileName, content, offset, length }, {
+    toolCallId: "write",
+    messages: [],
+  });
 
   const actualContent = await Deno.readTextFile(fileName);
   assertEquals(actualContent, "This REPLACED the initial content.");
