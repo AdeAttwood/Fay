@@ -1,39 +1,37 @@
-import { assertEquals } from "https://deno.land/std@0.177.1/testing/asserts.ts";
-import write from "./write.ts";
+import { assertEquals } from "https://deno.land/std@0.208.0/assert/assert_equals.ts";
+import writeTool from "./write.ts";
 
-Deno.test("write tool", async () => {
-  const fileName = "test.txt";
-  const content = "hello world";
+Deno.test("Write entire file", async () => {
+  const fileName = "test_file.txt";
+  const content = "Hello, world!";
 
-  // Call the write tool
-  await write.execute(
-    { fileName, content },
-    { toolCallId: "run", messages: [] },
-  );
+  await writeTool.execute({ fileName, content }, {
+    toolCallId: "write",
+    messages: [],
+  });
 
-  // Read the file and check if the content is correct
-  const fileContent = await Deno.readTextFile(fileName);
-  assertEquals(fileContent, content);
+  const actualContent = await Deno.readTextFile(fileName);
+  assertEquals(actualContent, content);
 
-  // Clean up the file
   await Deno.remove(fileName);
 });
 
-Deno.test("write tool with subdir", async () => {
-  const fileName = "subdir/test.txt";
-  const content = "hello world";
+Deno.test("Write part of file", async () => {
+  const fileName = "test_file.txt";
+  const initialContent = "This is the initial content.";
+  await Deno.writeTextFile(fileName, initialContent);
 
-  // Call the write tool
-  await write.execute(
-    { fileName, content },
-    { toolCallId: "run", messages: [] },
-  );
+  const content = "REPLACED";
+  const offset = 5;
+  const length = 2;
 
-  // Read the file and check if the content is correct
-  const fileContent = await Deno.readTextFile(fileName);
-  assertEquals(fileContent, content);
+  await writeTool.execute({ fileName, content, offset, length }, {
+    toolCallId: "write",
+    messages: [],
+  });
 
-  // Clean up the file
+  const actualContent = await Deno.readTextFile(fileName);
+  assertEquals(actualContent, "This REPLACED the initial content.");
+
   await Deno.remove(fileName);
-  await Deno.remove("subdir", { recursive: true });
 });
