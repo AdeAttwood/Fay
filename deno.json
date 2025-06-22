@@ -2,5 +2,8 @@
   "workspace": ["agent", "cli", "tools"],
   "tasks": {
     "compile:cli": "deno compile --allow-run --allow-read --allow-write --allow-env --allow-net -o bin/fay ./cli/main.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.13"
   }
 }

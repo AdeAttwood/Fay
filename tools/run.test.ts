@@ -1,7 +1,4 @@
-import {
-  assert,
-  assertEquals,
-} from "https://deno.land/std@0.177.1/testing/asserts.ts";
+import { assert, assertEquals } from "@std/assert";
 import run from "./run.ts";
 
 async function runTool(programme: string, args: string[]) {

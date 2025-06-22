@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.208.0/assert/assert_equals.ts";
+import { assertEquals } from "@std/assert";
 import writeTool from "./write.ts";
 
 Deno.test("Write entire file", async () => {
