@@ -94,12 +94,29 @@ const newCommand = new Command()
     agent.saveSession();
   });
 
+async function getInitalPropt(proptFile: string | undefined) {
+  if (proptFile) {
+    return await Deno.readTextFile(proptFile);
+  }
+
+  return await Input.prompt(`Prompt input`);
+}
+
 const run = new Command()
   .description("Run the interactive agent")
-  .action(async () => {
+  .option(
+    "--prompt-file <string>",
+    "A path to a file that contains the first propt you want to use",
+  )
+  .action(async ({ promptFile }) => {
     const sessions = await new SessionManager("./.git/fay/sessions").list();
     const agent = new Agent(sessions[0]);
     for (const message of agent.session.messages) {
+      printMessage(message);
+    }
+
+    const initalPropt = await getInitalPropt(promptFile);
+    for await (const message of agent.prompt(initalPropt)) {
       printMessage(message);
     }
 
