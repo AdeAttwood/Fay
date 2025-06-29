@@ -72,7 +72,9 @@ export class Agent {
       },
       onError: (error) => {
         throw new Error(
-          `Processing error: ${"message" in error ? error.message : "Unknown"}`,
+          `Processing error: ${
+            "message" in error ? error.message : JSON.stringify(error)
+          }`,
         );
       },
     });
