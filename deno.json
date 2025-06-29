@@ -1,7 +1,11 @@
 {
   "workspace": ["agent", "cli", "tools"],
   "tasks": {
-    "compile:cli": "deno compile --allow-run --allow-read --allow-write --allow-env --allow-net -o bin/fay ./cli/main.ts"
+    "compile:cli": "deno compile --allow-run --allow-read --allow-write --allow-env --allow-net -o bin/fay ./cli/main.ts",
+    "preflight:test": "deno lint .",
+    "preflight:format": "deno fmt --check",
+    "preflight:test": "deno test --allow-all",
+    "preflight:compile": { "dependencies": ["compile:cli"] }
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.13"
