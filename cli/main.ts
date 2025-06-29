@@ -5,6 +5,7 @@ import { Command } from "@cliffy/command";
 
 import { Agent } from "@fay/agent";
 import { SessionManager } from "./session-manager.ts";
+import { Configuration } from "../agent/config.ts";
 
 const userHighlight = colors.yellow.bold;
 const assistantHighlight = colors.green.bold;
@@ -109,8 +110,10 @@ const run = new Command()
     "A path to a file that contains the first propt you want to use",
   )
   .action(async ({ promptFile }) => {
+    const config = Configuration.find();
     const sessions = await new SessionManager("./.git/fay/sessions").list();
-    const agent = new Agent(sessions[0]);
+    const agent = new Agent(config, sessions[0]);
+
     for (const message of agent.session.messages) {
       printMessage(message);
     }
