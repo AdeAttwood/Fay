@@ -3,6 +3,7 @@ import systemPrompt from "./prompt.ts";
 import { inferProviderFromEnvironment } from "./provider.ts";
 import tools from "@fay/tools";
 import { type CoreMessage, type CoreUserMessage, streamText } from "ai";
+import { Configuration } from "./config.ts";
 
 export type NewAgentOptions = {
   title: string;
@@ -12,7 +13,10 @@ export class Agent {
   /**
    * @param session The session to use for the agent.
    */
-  constructor(public readonly session: Session) {
+  constructor(
+    public readonly config: Configuration,
+    public readonly session: Session,
+  ) {
     this.prompt = this.prompt.bind(this);
   }
 
@@ -21,12 +25,15 @@ export class Agent {
    * @returns A new agent.
    */
   public static new(options: NewAgentOptions) {
+    const config = Configuration.find();
+
     return new Agent(
+      config,
       new Session(
         crypto.randomUUID(),
         new Date().getTime(),
         options.title,
-        inferProviderFromEnvironment(),
+        inferProviderFromEnvironment(config),
         [{ role: "system", content: systemPrompt }],
       ),
     );

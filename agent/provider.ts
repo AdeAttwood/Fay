@@ -1,4 +1,5 @@
 import { google } from "@ai-sdk/google";
+import type { Configuration } from "./config.ts";
 
 export function createProvider(modelName: string) {
   switch (modelName) {
@@ -14,7 +15,11 @@ export function createProvider(modelName: string) {
   }
 }
 
-export function inferProviderFromEnvironment() {
+export function inferProviderFromEnvironment(config: Configuration) {
+  if (config.config.model) {
+    return createProvider(config.config.model);
+  }
+
   if (Deno.env.has("GOOGLE_GENERATIVE_AI_API_KEY")) {
     return createProvider("gemini-default");
   }
