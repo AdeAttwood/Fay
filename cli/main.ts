@@ -95,9 +95,9 @@ const newCommand = new Command()
     agent.saveSession();
   });
 
-async function getInitalPropt(proptFile: string | undefined) {
-  if (proptFile) {
-    return await Deno.readTextFile(proptFile);
+async function getInitalPrompt(promptFile: string | undefined) {
+  if (promptFile) {
+    return await Deno.readTextFile(promptFile);
   }
 
   return await Input.prompt(`Prompt input`);
@@ -107,7 +107,7 @@ const run = new Command()
   .description("Run the interactive agent")
   .option(
     "--prompt-file <string>",
-    "A path to a file that contains the first propt you want to use",
+    "A path to a file that contains the first prompt you want to use",
   )
   .action(async ({ promptFile }) => {
     const config = Configuration.find();
@@ -118,8 +118,8 @@ const run = new Command()
       printMessage(message);
     }
 
-    const initalPropt = await getInitalPropt(promptFile);
-    for await (const message of agent.prompt(initalPropt)) {
+    const initalPrompt = await getInitalPrompt(promptFile);
+    for await (const message of agent.prompt(initalPrompt)) {
       printMessage(message);
     }
 
