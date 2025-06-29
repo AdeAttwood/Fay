@@ -18,11 +18,22 @@ export default tool({
       return "Programme name cannot contain spaces. Provide the executable and its arguments separately.";
     }
 
-    const cmd = new Deno.Command(programme, { args });
+    const cmd = new Deno.Command(programme, {
+      args,
+      stdout: "piped",
+      stderr: "piped",
+    });
 
     try {
-      const { stdout } = await cmd.output();
-      return new TextDecoder().decode(stdout);
+      const { code, stdout, stderr } = await cmd.output();
+      const stdoutText = new TextDecoder().decode(stdout);
+      const stderrText = new TextDecoder().decode(stderr);
+
+      if (code === 0) {
+        return stdoutText;
+      } else {
+        return `Command failed with code ${code}: ${stderrText}`;
+      }
     } catch (e) {
       if (typeof e == "object" && e !== null && "code" in e) {
         switch (e.code) {
