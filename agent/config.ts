@@ -6,6 +6,14 @@ export interface AgentConfig {
    * in provider.ts.
    */
   model?: string;
+  /**
+   * Context files for the agent. These are files that provide additional
+   * context to the agent, they are usually project specific.
+   *
+   * The default value is `["AGENTS.md"]`, this will find it in the root of the
+   * agent context.
+   */
+  contextFiles?: string[];
 }
 
 export class Configuration {
@@ -51,5 +59,9 @@ export class Configuration {
     }
 
     return {};
+  }
+
+  public contextFiles(): string[] {
+    return this.config.contextFiles || ["AGENTS.md"];
   }
 }
