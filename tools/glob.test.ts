@@ -28,6 +28,28 @@ Deno.test("glob tool should find files matching the pattern", async () => {
   await Deno.remove("test_glob_dir", { recursive: true });
 });
 
+Deno.test("glob tool should ignore excluded directories", async () => {
+  await Deno.mkdir("test_glob_dir/node_modules", { recursive: true });
+  await Deno.writeTextFile("test_glob_dir/node_modules/file.txt", "content");
+  await Deno.mkdir("test_glob_dir/.git", { recursive: true });
+  await Deno.writeTextFile("test_glob_dir/.git/file.txt", "content");
+  await Deno.mkdir("test_glob_dir/obj", { recursive: true });
+  await Deno.writeTextFile("test_glob_dir/obj/file.txt", "content");
+  await Deno.mkdir("test_glob_dir/bin", { recursive: true });
+  await Deno.writeTextFile("test_glob_dir/bin/file.txt", "content");
+  await Deno.writeTextFile("test_glob_dir/file.txt", "content");
+
+  const result = await runTool("test_glob_dir/**/*.txt");
+
+  assert(result.includes("file.txt"), "includes file.txt");
+  assert(!result.includes("node_modules"), "does not include node_modules");
+  assert(!result.includes(".git"), "does not include .git");
+  assert(!result.includes("obj"), "does not include obj");
+  assert(!result.includes("bin"), "does not include bin");
+
+  await Deno.remove("test_glob_dir", { recursive: true });
+});
+
 Deno.test("glob tool should return an empty string when no files match", async () => {
   const result = await runTool("non_existent_dir/**/*.txt");
   assertEquals(result, "");

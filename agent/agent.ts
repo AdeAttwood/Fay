@@ -1,5 +1,6 @@
 import { Session } from "./session.ts";
-import systemPrompt from "./prompt.ts";
+import { buildSystemPrompt } from "./prompt/index.ts";
+
 import { inferProviderFromEnvironment } from "./provider.ts";
 import tools from "@fay/tools";
 import { type CoreMessage, type CoreUserMessage, streamText } from "ai";
@@ -34,7 +35,7 @@ export class Agent {
         new Date().getTime(),
         options.title,
         inferProviderFromEnvironment(config),
-        [{ role: "system", content: systemPrompt }],
+        [{ role: "system", content: buildSystemPrompt(config) }],
       ),
     );
   }
@@ -51,6 +52,11 @@ export class Agent {
   public prompt = async function* prompt(this: Agent, content: string) {
     const userMessage: CoreUserMessage = { role: "user", content };
     this.session.messages.push(userMessage);
+
+    this.session.messages[0] = {
+      role: "system",
+      content: buildSystemPrompt(this.config),
+    };
 
     yield userMessage;
 

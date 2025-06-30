@@ -17,7 +17,11 @@ export default tool({
     }
 
     const entries = [];
-    for (const entry of expandGlobSync(pattern)) {
+    for (
+      const entry of expandGlobSync(pattern, {
+        exclude: ["**/node_modules/**", "**/.git/**", "**/obj/**", "**/bin/**"],
+      })
+    ) {
       if (entry.isFile) {
         entries.push(entry.path);
       }
