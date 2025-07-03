@@ -1,0 +1,21 @@
+name: Conventional Tools Commitlint
+
+on:
+  push: { branches: ["development"] }
+  pull_request: { branches: ["development"] }
+
+jobs:
+  commits:
+    name: Commitlint
+    runs-on: ubuntu-latest
+    container: practically/conventional-tools:1.x@sha256:a3e98697743d8801c694b92553da733aff0fbae6bf92876b13c92343a569f049
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with: { fetch-depth: 1000 }
+
+      - name: Git safe.directory
+        run: git config --global --add safe.directory $PWD
+
+      - name: Lint commits
+        run: conventional-tools commitlint -l1
