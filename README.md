@@ -66,3 +66,10 @@ the agent, they are usually project specific. The default value is
   ]
 }
 ```
+
+## Slash Commands
+
+| Command  | Description                                                 |
+| :------- | :---------------------------------------------------------- |
+| `/open`  | Opens the default editor (`$EDITOR`) for multi-line input.  |
+| `/system`| Displays the current system prompt.                         |
