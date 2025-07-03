@@ -27,12 +27,53 @@ const newCommand = new Command()
     agent.saveSession();
   });
 
-async function getInitalPrompt(promptFile: string | undefined) {
+async function getInputFromEditor() {
+  const editor = Deno.env.get("EDITOR") || "nvim";
+  const tmpFile = await Deno.makeTempFile({
+    prefix: "fay-",
+    suffix: ".prompt.md",
+  });
+  await new Deno.Command(editor, {
+    args: [tmpFile],
+    stdin: "inherit",
+    stdout: "inherit",
+    stderr: "inherit",
+  }).output();
+
+  const result = await Deno.readTextFile(tmpFile);
+  await Deno.remove(tmpFile);
+
+  return result;
+}
+
+async function prompt(agent: Agent) {
+  const input = await Input.prompt({
+    message: `Prompt input`,
+    suggestions: [
+      "/open",
+      "/system",
+    ],
+  });
+
+  switch (input) {
+    case "/system":
+      console.log(agent.session.messages[0].content);
+      return undefined;
+
+    case "/open":
+      return await getInputFromEditor();
+
+    default:
+      return input;
+  }
+}
+
+async function getInitalPrompt(agent: Agent, promptFile: string | undefined) {
   if (promptFile) {
     return await Deno.readTextFile(promptFile);
   }
 
-  return await Input.prompt(`Prompt input`);
+  return prompt(agent);
 }
 
 const run = new Command()
@@ -50,15 +91,19 @@ const run = new Command()
       printMessage(message);
     }
 
-    const initalPrompt = await getInitalPrompt(promptFile);
-    for await (const message of agent.prompt(initalPrompt)) {
-      printMessage(message);
+    const initalPrompt = await getInitalPrompt(agent, promptFile);
+    if (initalPrompt) {
+      for await (const message of agent.prompt(initalPrompt)) {
+        printMessage(message);
+      }
     }
 
     while (true) {
-      const prompt = await Input.prompt(`Prompt input`);
-      for await (const message of agent.prompt(prompt)) {
-        printMessage(message);
+      const inputPrompt = await prompt(agent);
+      if (inputPrompt) {
+        for await (const message of agent.prompt(inputPrompt)) {
+          printMessage(message);
+        }
       }
     }
   });
