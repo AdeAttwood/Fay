@@ -18,12 +18,17 @@ const list = new Command()
 const newCommand = new Command()
   .description("Create a new session")
   .option("--title <string>", "The title of the new session")
-  .action(({ title }) => {
-    if (typeof title === "undefined") {
+  .action(async ({ title }) => {
+    let sessionTitle = title;
+    if (typeof sessionTitle === "undefined") {
+      sessionTitle = await Input.prompt("Session title");
+    }
+
+    if (typeof sessionTitle === "undefined") {
       throw new Error("Session title is required");
     }
 
-    const agent = Agent.new({ title });
+    const agent = Agent.new({ title: sessionTitle });
     agent.saveSession();
   });
 
