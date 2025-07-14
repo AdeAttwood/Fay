@@ -12,14 +12,18 @@ export default tool({
       .describe(
         "An array of arguments to pass to the command (e.g., ['-l', '-a'])",
       ),
+    cwd: z.string().optional().describe(
+      "The current working directory to run the command in, this can be used instead of running the `cd` command",
+    ),
   }),
-  execute: async ({ programme, args }) => {
+  execute: async ({ programme, args, cwd }) => {
     if (programme.includes(" ")) {
       return "Programme name cannot contain spaces. Provide the executable and its arguments separately.";
     }
 
     const cmd = new Deno.Command(programme, {
       args,
+      cwd,
       stdout: "piped",
       stderr: "piped",
     });
