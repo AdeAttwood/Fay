@@ -76,6 +76,8 @@ export class Agent {
 
           if (!existing) {
             this.session.messages.push(message);
+            this.saveSession();
+
             messageQueue.push(message);
           }
         }
