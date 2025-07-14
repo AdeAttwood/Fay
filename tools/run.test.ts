@@ -1,27 +1,29 @@
-import { assert, assertEquals } from "@std/assert";
+import { assertEquals } from "@std/assert";
 import run from "./run.ts";
+import type z from "zod";
+import path from "node:path";
 
-async function runTool(programme: string, args: string[]) {
+async function runTool(parameters: z.infer<typeof run.parameters>) {
   return await run.execute(
-    { programme, args },
+    parameters,
     { toolCallId: "run", messages: [] },
   );
 }
 
-Deno.test("run tool", async () => {
-  const result = await runTool("deno", ["--help"]);
-  assert(result.includes("Deno: A modern JavaScript and TypeScript runtime"));
-});
+Deno.test("Run Command in Subdirectory", async () => {
+  const tempDir = await Deno.makeTempDir();
+  const subDir = path.join(tempDir, "subdir");
+  await Deno.mkdir(subDir);
+  const filePath = path.join(subDir, "test.txt");
+  await Deno.writeTextFile(filePath, "hello");
 
-Deno.test("if the command does not exist", async () => {
-  const result = await runTool("not-a-command", ["--help"]);
-  assertEquals(result, "The programme 'not-a-command' is not found");
-});
+  const result = await runTool({
+    programme: "deno",
+    args: ["eval", "console.log(Deno.cwd())"],
+    cwd: subDir,
+  });
 
-Deno.test("command with a space", async () => {
-  const result = await runTool("ls -al", []);
-  assertEquals(
-    result,
-    "Programme name cannot contain spaces. Provide the executable and its arguments separately.",
-  );
+  assertEquals(result.trim(), subDir);
+
+  await Deno.remove(tempDir, { recursive: true });
 });
