@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "exports": "./mod.ts",
   "imports": {
+    "@ai-sdk/anthropic": "npm:@ai-sdk/anthropic@^1.2.12",
     "@ai-sdk/google": "npm:@ai-sdk/google@^1.2.19",
     "@std/fs": "jsr:@std/fs@^1.0.18",
     "ai": "npm:ai@^4.3.16",
