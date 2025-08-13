@@ -66,6 +66,7 @@ export class Agent {
       model: this.session.model,
       messages: this.session.messages,
       maxSteps: 1000,
+      maxTokens: 30000,
       tools,
       toolCallStreaming: true,
       onStepFinish: (step) => {

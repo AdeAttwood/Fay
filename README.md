@@ -29,6 +29,10 @@ need to set the `GOOGLE_GENERATIVE_AI_API_KEY` environment variable.
 export GOOGLE_GENERATIVE_AI_API_KEY=<your_api_key>
 ```
 
+```bash
+export ANTHROPIC_API_KEY=<your_api_key>
+```
+
 To run the interactive agent
 
 ```bash

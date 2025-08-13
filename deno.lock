@@ -19,6 +19,7 @@
     "jsr:@std/path@^1.1.0": "1.1.0",
     "jsr:@std/path@~1.0.6": "1.0.9",
     "jsr:@std/text@~1.0.7": "1.0.14",
+    "npm:@ai-sdk/anthropic@^1.2.12": "1.2.12_zod@3.25.64",
     "npm:@ai-sdk/google@^1.2.19": "1.2.19_zod@3.25.64",
     "npm:@types/node@*": "22.12.0",
     "npm:ai@^4.3.16": "4.3.16_zod@3.25.64",
@@ -110,6 +111,14 @@
     }
   },
   "npm": {
+    "@ai-sdk/anthropic@1.2.12_zod@3.25.64": {
+      "integrity": "sha512-YSzjlko7JvuiyQFmI9RN1tNZdEiZxc+6xld/0tq/VkJaHpEzGAb1yiNxxvmYVcjvfu/PcvCxAAYXmTYQQ63IHQ==",
+      "dependencies": [
+        "@ai-sdk/provider",
+        "@ai-sdk/provider-utils",
+        "zod"
+      ]
+    },
     "@ai-sdk/google@1.2.19_zod@3.25.64": {
       "integrity": "sha512-Xgl6eftIRQ4srUdCzxM112JuewVMij5q4JLcNmHcB68Bxn9dpr3MVUSPlJwmameuiQuISIA8lMB+iRiRbFsaqA==",
       "dependencies": [
@@ -178,9 +187,6 @@
         "@opentelemetry/api",
         "jsondiffpatch",
         "zod"
-      ],
-      "optionalPeers": [
-        "react"
       ]
     },
     "chalk@5.4.1": {
@@ -359,6 +365,7 @@
       "agent": {
         "dependencies": [
           "jsr:@std/fs@^1.0.18",
+          "npm:@ai-sdk/anthropic@^1.2.12",
           "npm:@ai-sdk/google@^1.2.19",
           "npm:ai@^4.3.16",
           "npm:zod@^3.25.64"
