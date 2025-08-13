@@ -3,10 +3,11 @@ import z from "zod";
 import { expandGlobSync } from "@std/fs/expand-glob";
 
 export default tool({
-  description: "Find files by matching a glob pattern",
+  description:
+    "Find files by matching a glob pattern, this can be used to list files too using `*` as the pattern",
   parameters: z.object({
     pattern: z.string().describe(
-      "The glob pattern to match files (e.g., '*.txt', 'src/**/*.js')",
+      "The glob pattern to match files (e.g., '*', '*.txt', 'src/**/*.js')",
     ),
   }),
   // The execute function needs to be async
@@ -22,9 +23,8 @@ export default tool({
         exclude: ["**/node_modules/**", "**/.git/**", "**/obj/**", "**/bin/**"],
       })
     ) {
-      if (entry.isFile) {
-        entries.push(entry.path);
-      }
+      const prefix = entry.isDirectory ? "dir: " : "file: ";
+      entries.push(prefix + entry.path);
     }
 
     return entries.join("\n");
