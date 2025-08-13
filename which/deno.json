@@ -1,0 +1,8 @@
+{
+  "name": "@fay/which",
+  "version": "0.0.1",
+  "exports": "./mod.ts",
+  "imports": {
+    "@std/fs": "jsr:@std/fs@^1.0.18"
+  }
+}
