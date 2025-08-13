@@ -381,6 +381,11 @@
           "npm:ai@^4.3.16",
           "npm:zod@^3.25.64"
         ]
+      },
+      "which": {
+        "dependencies": [
+          "jsr:@std/fs@^1.0.18"
+        ]
       }
     }
   }
