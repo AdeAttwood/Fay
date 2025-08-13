@@ -17,7 +17,7 @@ jobs:
           deno-version: "2.x"
 
       - name: Lint
-        run: deno lint .
+        run: deno lint --unstable-raw-imports .
 
       - name: Format
         run: deno fmt --check
