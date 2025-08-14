@@ -4,7 +4,11 @@ import { Command } from "@cliffy/command";
 import { Agent } from "@fay/agent";
 import { SessionManager } from "./session-manager.ts";
 import { Configuration } from "../agent/config.ts";
-import { printMessage } from "./printer.ts";
+import {
+  consoleFormat,
+  formatMessage,
+  markdownFormat,
+} from "./formatter/index.ts";
 
 const list = new Command()
   .description("List all the session you have available")
@@ -93,13 +97,13 @@ const run = new Command()
     const agent = new Agent(config, sessions[0]);
 
     for (const message of agent.session.messages) {
-      printMessage(message);
+      formatMessage(message, agent.session.messages, consoleFormat);
     }
 
     const initalPrompt = await getInitalPrompt(agent, promptFile);
     if (initalPrompt) {
       for await (const message of agent.prompt(initalPrompt)) {
-        printMessage(message);
+        formatMessage(message, agent.session.messages, consoleFormat);
       }
     }
 
@@ -107,9 +111,18 @@ const run = new Command()
       const inputPrompt = await prompt(agent);
       if (inputPrompt) {
         for await (const message of agent.prompt(inputPrompt)) {
-          printMessage(message);
+          formatMessage(message, agent.session.messages, consoleFormat);
         }
       }
+    }
+  });
+
+const markdown = new Command()
+  .description("Print the session in markdown format")
+  .action(async () => {
+    const sessions = await new SessionManager("./.git/fay/sessions").list();
+    for (const message of sessions[0].messages) {
+      formatMessage(message, sessions[0].messages, markdownFormat);
     }
   });
 
@@ -118,5 +131,6 @@ await new Command()
   .default("run")
   .command("list", list)
   .command("new", newCommand)
+  .command("md", markdown)
   .command("run", run)
   .parse(Deno.args);
