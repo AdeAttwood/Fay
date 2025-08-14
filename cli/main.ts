@@ -32,6 +32,7 @@ const newCommand = new Command()
       throw new Error("Session title is required");
     }
 
+    new SessionManager("./.git/fay/sessions");
     const agent = Agent.new({ title: sessionTitle });
     agent.saveSession();
   });
