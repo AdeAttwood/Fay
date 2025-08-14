@@ -7,8 +7,10 @@ export default tool({
     programme: z.string().describe(
       "The programme to execute (e.g., 'ls', 'pwd')",
     ),
-    args: z
-      .array(z.string())
+    args: z.union([
+      z.array(z.string()),
+      z.string(),
+    ])
       .describe(
         "An array of arguments to pass to the command (e.g., ['-l', '-a'])",
       ),
@@ -16,9 +18,18 @@ export default tool({
       "The current working directory to run the command in, this can be used instead of running the `cd` command",
     ),
   }),
-  execute: async ({ programme, args, cwd }) => {
+  execute: async ({ programme, args: inputArgs, cwd }) => {
     if (programme.includes(" ")) {
       return "Programme name cannot contain spaces. Provide the executable and its arguments separately.";
+    }
+
+    let args = inputArgs;
+    if (typeof inputArgs === "string" && inputArgs.startsWith("[")) {
+      args = JSON.parse(inputArgs);
+    }
+
+    if (!Array.isArray(args)) {
+      args = [args];
     }
 
     const cmd = new Deno.Command(programme, {
@@ -36,7 +47,7 @@ export default tool({
       if (code === 0) {
         return stdoutText;
       } else {
-        return `Command failed with code ${code}: ${stderrText}`;
+        return `Command failed with code ${code}: ${stdoutText}${stderrText}`;
       }
     } catch (e) {
       if (typeof e == "object" && e !== null && "code" in e) {
