@@ -114,7 +114,7 @@ async function getPrompt(agent: Agent) {
   return input;
 }
 
-async function getInitalPrompt(
+async function getInitialPrompt(
   agent: Agent,
   prompt: string | undefined,
   promptFile: string | undefined,
@@ -149,9 +149,9 @@ const run = new Command()
       formatMessage(message, agent.session.messages, consoleFormat);
     }
 
-    const initalPrompt = await getInitalPrompt(agent, prompt, promptFile);
-    if (initalPrompt) {
-      for await (const message of agent.prompt(initalPrompt)) {
+    const initialPrompt = await getInitialPrompt(agent, prompt, promptFile);
+    if (initialPrompt) {
+      for await (const message of agent.prompt(initialPrompt)) {
         formatMessage(message, agent.session.messages, consoleFormat);
       }
     }
