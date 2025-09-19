@@ -57,8 +57,10 @@ const toolCallSchema = z.union([
     toolName: z.literal("run"),
     args: z.object({
       programme: z.string(),
-      args: z
-        .array(z.string()),
+      args: z.union([
+        z.array(z.string()),
+        z.string(),
+      ]),
       cwd: z.string().optional(),
     }),
   }),
@@ -215,10 +217,19 @@ function printToolMessage(
     }
 
     if (toolCall.toolName === "run") {
+      let args = toolCall.args.args;
+      if (typeof args === "string") {
+        try {
+          args = JSON.parse(args) as string[];
+        } catch (_) {
+          args = [args as string];
+        }
+      }
+
       return format.write({
         type: "run",
         programme: toolCall.args.programme,
-        args: toolCall.args.args,
+        args,
         result: stringResult,
       });
     }
