@@ -14,6 +14,22 @@ export interface AgentConfig {
    * agent context.
    */
   contextFiles?: string[];
+  /**
+   * The shell to run commands in. The command string to run will be added as a
+   * single argument at the end of the args.
+   *
+   * For example:
+   *
+   * { command: "bash", args: "-c" }
+   *
+   * Will produce the command
+   *
+   * bash -c "ls -al"
+   */
+  shell?: {
+    command: string;
+    args: string[];
+  };
 }
 
 export class Configuration {
@@ -63,5 +79,14 @@ export class Configuration {
 
   public contextFiles(): string[] {
     return this.config.contextFiles || ["AGENTS.md"];
+  }
+
+  public shell() {
+    return (
+      this.config.shell ?? {
+        command: "nu",
+        args: ["-c"],
+      }
+    );
   }
 }
