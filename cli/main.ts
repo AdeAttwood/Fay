@@ -1,14 +1,16 @@
 import { Input } from "@cliffy/prompt";
+import { Select } from "@cliffy/prompt/select";
 import { Command } from "@cliffy/command";
 
 import { Agent } from "@fay/agent";
 import { SessionManager } from "./session-manager.ts";
-import { Configuration } from "../agent/config.ts";
+import { AgentConfig, Configuration } from "../agent/config.ts";
 import {
   consoleFormat,
   formatMessage,
   markdownFormat,
 } from "./formatter/index.ts";
+import { providers } from "../agent/provider.ts";
 
 const list = new Command()
   .description("List all the session you have available")
@@ -17,6 +19,29 @@ const list = new Command()
     for (const session of await sessions.list()) {
       console.log(session.id, session.title, `(${session.createdAt})`);
     }
+  });
+
+const model = new Command()
+  .description("List all available models")
+  .action(async () => {
+    const model = await Select.prompt({
+      message: "Choose a new model",
+      options: providers.map((p) => ({ name: p.display, value: p.id })),
+    });
+
+    let config: AgentConfig = {};
+    try {
+      config = JSON.parse(Deno.readTextFileSync("./.git/fay/fay.json"));
+    } catch {
+      config = {};
+    }
+
+    config.model = model;
+
+    Deno.writeTextFileSync(
+      "./.git/fay/fay.json",
+      JSON.stringify(config, undefined, 2),
+    );
   });
 
 const newCommand = new Command()
@@ -58,7 +83,7 @@ async function getInputFromEditor() {
 
 async function getPrompt(agent: Agent) {
   const input = await Input.prompt({
-    message: `Prompt input`,
+    message: `Prompt input (${agent.config.config.model})`,
     suggestions: [
       "/open",
       "/system",
@@ -156,5 +181,6 @@ await new Command()
   .command("list", list)
   .command("new", newCommand)
   .command("md", markdown)
+  .command("model", model)
   .command("run", run)
   .parse(Deno.args);
