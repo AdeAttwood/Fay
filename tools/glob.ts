@@ -5,7 +5,7 @@ import { expandGlobSync } from "@std/fs/expand-glob";
 export default tool({
   description:
     "Find files by matching a glob pattern, this can be used to list files too using `*` as the pattern",
-  parameters: z.object({
+  inputSchema: z.object({
     pattern: z.string().describe(
       "The glob pattern to match files (e.g., '*', '*.txt', 'src/**/*.js')",
     ),

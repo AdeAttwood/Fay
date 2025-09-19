@@ -5,7 +5,7 @@ Deno.test("Write entire file", async () => {
   const fileName = "test_file.txt";
   const content = "Hello, world!";
 
-  await writeTool.execute({ fileName, content }, {
+  await writeTool.execute?.({ fileName, content }, {
     toolCallId: "write",
     messages: [],
   });
@@ -25,7 +25,7 @@ Deno.test("Write part of file", async () => {
   const offset = 5;
   const length = 2;
 
-  await writeTool.execute({ fileName, content, offset, length }, {
+  await writeTool.execute?.({ fileName, content, offset, length }, {
     toolCallId: "write",
     messages: [],
   });

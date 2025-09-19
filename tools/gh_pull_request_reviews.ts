@@ -55,7 +55,7 @@ async function getReviewComments(
 
 export default tool({
   description: "Get all the pull request review comments",
-  parameters: z.object({
+  inputSchema: z.object({
     prNumber: z.number().describe(
       "The pull request you want to get the review comments for",
     ),
