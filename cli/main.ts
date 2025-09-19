@@ -56,7 +56,7 @@ async function getInputFromEditor() {
   return result;
 }
 
-async function prompt(agent: Agent) {
+async function getPrompt(agent: Agent) {
   const input = await Input.prompt({
     message: `Prompt input`,
     suggestions: [
@@ -78,12 +78,20 @@ async function prompt(agent: Agent) {
   }
 }
 
-async function getInitalPrompt(agent: Agent, promptFile: string | undefined) {
+async function getInitalPrompt(
+  agent: Agent,
+  prompt: string | undefined,
+  promptFile: string | undefined,
+) {
+  if (prompt) {
+    return prompt;
+  }
+
   if (promptFile) {
     return await Deno.readTextFile(promptFile);
   }
 
-  return prompt(agent);
+  return getPrompt(agent);
 }
 
 const run = new Command()
@@ -92,7 +100,11 @@ const run = new Command()
     "--prompt-file <string>",
     "A path to a file that contains the first prompt you want to use",
   )
-  .action(async ({ promptFile }) => {
+  .option(
+    "--prompt <string>",
+    "Text to be used as the first prompt (overrides --prompt-file)",
+  )
+  .action(async ({ prompt, promptFile }) => {
     const config = Configuration.find();
     const sessions = await new SessionManager("./.git/fay/sessions").list();
     const agent = new Agent(config, sessions[0]);
@@ -101,7 +113,7 @@ const run = new Command()
       formatMessage(message, agent.session.messages, consoleFormat);
     }
 
-    const initalPrompt = await getInitalPrompt(agent, promptFile);
+    const initalPrompt = await getInitalPrompt(agent, prompt, promptFile);
     if (initalPrompt) {
       for await (const message of agent.prompt(initalPrompt)) {
         formatMessage(message, agent.session.messages, consoleFormat);
@@ -109,7 +121,7 @@ const run = new Command()
     }
 
     while (true) {
-      const inputPrompt = await prompt(agent);
+      const inputPrompt = await getPrompt(agent);
       if (inputPrompt) {
         for await (const message of agent.prompt(inputPrompt)) {
           formatMessage(message, agent.session.messages, consoleFormat);
