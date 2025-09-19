@@ -2,12 +2,14 @@ import type { Configuration } from "../config.ts";
 import { which } from "@fay/which";
 
 import systemPrompt from "./system.md" with { type: "text" };
+import { expandGlobSync } from "@std/fs/expand-glob";
 
 export function buildSystemPrompt(config: Configuration) {
   let prompt = systemPrompt;
 
   prompt += getEnvironmentSection();
   prompt += getShellUsageSection();
+  prompt += dotnetSection();
 
   if (which("sl")) {
     prompt += getSaplingSection();
@@ -91,6 +93,51 @@ function getShellUsageSection() {
 
   section.push("");
   section.push("");
+
+  return section.join("\n");
+}
+
+function dotnetSection() {
+  let section: string[] = [];
+  const dotnet = which("dotnet");
+  if (!dotnet) {
+    return "";
+  }
+
+  for (
+    const entry of expandGlobSync("**/*.sln", {
+      exclude: ["**/node_modules/**", "**/.git/**", "**/obj/**", "**/bin/**"],
+    })
+  ) {
+    const projects = new Deno.Command(dotnet, {
+      args: [
+        "sln",
+        entry.path,
+        "list",
+      ],
+    }).outputSync();
+
+    section = section.concat([
+      `# Dotnet solution found at "${entry.path}"`,
+      ``,
+      `## Project list`,
+      ``,
+      new TextDecoder().decode(projects.stdout),
+      ``,
+      ``,
+    ]);
+  }
+
+  if (section.length > 0) {
+    const info = new Deno.Command(dotnet, { args: ["--info"] }).outputSync();
+    section = [
+      `## Using dotnet from "${dotnet}"`,
+      ``,
+      new TextDecoder().decode(info.stdout),
+      ``,
+      ``,
+    ].concat(section);
+  }
 
   return section.join("\n");
 }
