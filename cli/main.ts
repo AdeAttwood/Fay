@@ -62,6 +62,7 @@ async function getPrompt(agent: Agent) {
     suggestions: [
       "/open",
       "/system",
+      "/run",
     ],
   });
 
@@ -72,10 +73,16 @@ async function getPrompt(agent: Agent) {
 
     case "/open":
       return await getInputFromEditor();
-
-    default:
-      return input;
   }
+
+  if (input.startsWith("/run")) {
+    const command = input.substring(4);
+    const result = await new Deno.Command("nu", { args: ["-c", command] })
+      .output();
+    return "Run: " + command + "\n\n" + new TextDecoder().decode(result.stdout);
+  }
+
+  return input;
 }
 
 async function getInitalPrompt(

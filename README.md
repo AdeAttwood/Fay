@@ -109,3 +109,4 @@ They can be typed into the interactive input.
 | :-------- | :--------------------------------------------------------- |
 | `/open`   | Opens the default editor (`$EDITOR`) for multi-line input. |
 | `/system` | Displays the current system prompt.                        |
+| `/run`    | Runs a shell command via Nushell and displays the output.  |
