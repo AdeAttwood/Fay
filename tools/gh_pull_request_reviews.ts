@@ -72,13 +72,13 @@ export default tool({
       );
 
       return [
-        `# Review ${review.id}`,
+        `### Review ${review.id}`,
         "",
         review.body.trim(),
         "",
         ...comments.map((c) => {
           return [
-            `## Comment ${c.id}`,
+            `#### Comment ${c.id}`,
             "",
             "```diff",
             c.diff_hunk,

@@ -14,6 +14,7 @@ export type FormatItem =
   | { type: "write"; content: string; fileName: string }
   | { type: "run"; programme: string; args: string[]; result: string }
   | { type: "glob"; content: string; pattern: string }
+  | { type: "review-comments"; content: string }
   | { type: "tool-result"; content: string };
 
 export type DiffItem = {
@@ -63,6 +64,10 @@ const toolCallSchema = z.union([
       ]),
       cwd: z.string().optional(),
     }),
+  }),
+  z.object({
+    toolName: z.literal("ghPullReviewReviews"),
+    args: z.object({}),
   }),
 ]);
 
@@ -175,7 +180,10 @@ function printToolMessage(
       getToolCall(c.toolCallId, messages),
     );
     if (!toolCallResult.success) {
-      return;
+      console.log(toolCallResult.error);
+      console.log(c);
+
+      throw new Error("Error parsing tool response");
     }
 
     const toolCall = toolCallResult.data;
@@ -231,6 +239,13 @@ function printToolMessage(
         programme: toolCall.args.programme,
         args,
         result: stringResult,
+      });
+    }
+
+    if (toolCall.toolName === "ghPullReviewReviews") {
+      return format.write({
+        type: "review-comments",
+        content: stringResult,
       });
     }
 
