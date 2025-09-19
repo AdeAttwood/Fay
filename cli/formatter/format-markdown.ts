@@ -64,6 +64,12 @@ export const markdownFormat: Format = {
           item.result,
         );
         return;
+      case "review-comments":
+        console.log("## REVIEW COMMENTS:");
+        console.log("");
+        console.log(item.content);
+        console.log("");
+        return;
       case "tool-result":
         console.log(`## TOOL RESULT:`);
         details("Tool Result", item.content);

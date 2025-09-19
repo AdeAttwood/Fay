@@ -74,7 +74,8 @@ export const consoleFormat: Format = {
         console.log(toolHighlight("┃"));
         return;
       case "tool-result":
-        console.log(toolHighlight("┃ TOOL RESULT:"));
+      case "review-comments":
+        console.log(toolHighlight(`┃ ${item.type.toUpperCase()}:`));
         console.log(toolHighlight("┃"));
         for (const line of item.content.split("\n")) {
           console.log(toolHighlight("┃"), line);
