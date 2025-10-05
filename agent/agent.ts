@@ -3,14 +3,7 @@ import { buildSystemPrompt } from "./prompt/index.ts";
 
 import { createProvider, inferProviderFromEnvironment } from "./provider.ts";
 import tools from "@fay/tools";
-import {
-  AssistantModelMessage,
-  stepCountIs,
-  streamText,
-  SystemModelMessage,
-  ToolModelMessage,
-  UserModelMessage,
-} from "ai";
+import { stepCountIs, streamText } from "ai";
 import { toInternalmessage, toModelMessage } from "./mapper.ts";
 import type { InternalMessage } from "./types.ts";
 import { Configuration } from "./config.ts";
