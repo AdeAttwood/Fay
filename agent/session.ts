@@ -1,7 +1,8 @@
-import type { CoreMessage, LanguageModel } from "ai";
+import type { LanguageModel as LanguageModelApi } from "ai";
+import type { InternalMessage } from "./types.ts";
 import createProvider from "./provider.ts";
 
-type Messages = Array<CoreMessage>;
+type Messages = Array<InternalMessage>;
 
 export class Session {
   /**
@@ -12,7 +13,8 @@ export class Session {
     public readonly id: string,
     public readonly createdAt: number,
     public readonly title: string,
-    public readonly model: LanguageModel,
+    public readonly modelId: string,
+    public readonly model: LanguageModelApi,
     public readonly messages: Messages = [],
   ) {}
 
@@ -27,6 +29,7 @@ export class Session {
       sessionData.id,
       sessionData.createdAt,
       sessionData.title,
+      sessionData.model,
       createProvider(sessionData.model),
       sessionData.messages,
     );
@@ -43,7 +46,7 @@ export class Session {
         id: this.id,
         createdAt: this.createdAt,
         title: this.title,
-        model: this.model.modelId,
+        model: this.modelId,
         messages: this.messages,
       }),
     );

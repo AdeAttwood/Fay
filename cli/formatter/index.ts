@@ -1,9 +1,9 @@
 import type {
-  CoreAssistantMessage,
-  CoreMessage,
-  CoreToolMessage,
-  UserContent,
-} from "ai";
+  InternalAssistantMessage,
+  InternalMessage,
+  InternalToolMessage,
+  InternalUserContent,
+} from "@fay/agent";
 import z from "zod";
 
 export type FormatItem =
@@ -137,7 +137,10 @@ function formatDiff(oldText: string, newText: string): DiffItem[] {
   return output;
 }
 
-function printAssistantMessage(message: CoreAssistantMessage, format: Format) {
+function printAssistantMessage(
+  message: InternalAssistantMessage,
+  format: Format,
+) {
   if (typeof message.content === "string") {
     return format.write({
       type: "assistant-message",
@@ -155,7 +158,7 @@ function printAssistantMessage(message: CoreAssistantMessage, format: Format) {
   });
 }
 
-function getToolCall(id: string, messages: CoreMessage[]) {
+function getToolCall(id: string, messages: InternalMessage[]) {
   for (const message of messages) {
     if (message.role === "assistant") {
       for (const content of message.content) {
@@ -171,8 +174,8 @@ function getToolCall(id: string, messages: CoreMessage[]) {
 }
 
 function printToolMessage(
-  message: CoreToolMessage,
-  messages: CoreMessage[],
+  message: InternalToolMessage,
+  messages: InternalMessage[],
   format: Format,
 ) {
   message.content.forEach((c) => {
@@ -260,7 +263,7 @@ function printToolMessage(
   });
 }
 
-function formatUserMessageContent(message: UserContent) {
+function formatUserMessageContent(message: InternalUserContent) {
   if (typeof message === "string") {
     return message;
   }
@@ -269,8 +272,8 @@ function formatUserMessageContent(message: UserContent) {
 }
 
 export function formatMessage(
-  message: CoreMessage,
-  messages: CoreMessage[],
+  message: InternalMessage,
+  messages: InternalMessage[],
   format: Format,
 ) {
   switch (message.role) {
