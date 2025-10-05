@@ -1,0 +1,13 @@
+{
+  "name": "@fay/stdio_server",
+  "version": "0.0.1",
+  "exports": "./mod.ts",
+  "imports": {
+    "@std/io": "jsr:@std/io@^0.225.2"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-slow-types"]
+    }
+  }
+}
