@@ -1,4 +1,4 @@
-import { Session } from "@fay/agent";
+import { Session } from "./session.ts";
 import { existsSync } from "@std/fs/exists";
 
 export class SessionManager {

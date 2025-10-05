@@ -9,13 +9,26 @@ import z from "zod";
 export type FormatItem =
   | { type: "user-message"; content: string }
   | { type: "assistant-message"; content: string }
-  | { type: "edit"; content: DiffItem[]; fileName: string }
-  | { type: "read"; content: string; fileName: string }
-  | { type: "write"; content: string; fileName: string }
-  | { type: "run"; programme: string; args: string[]; result: string }
-  | { type: "glob"; content: string; pattern: string }
-  | { type: "review-comments"; content: string }
-  | { type: "tool-result"; content: string };
+  | {
+    type: "edit";
+    toolCallId: string;
+    oldContent: string;
+    newContent: string;
+    content: DiffItem[];
+    fileName: string;
+  }
+  | { type: "read"; content: string; fileName: string; toolCallId: string }
+  | { type: "write"; content: string; fileName: string; toolCallId: string }
+  | {
+    type: "run";
+    programme: string;
+    args: string[];
+    result: string;
+    toolCallId: string;
+  }
+  | { type: "glob"; content: string; pattern: string; toolCallId: string }
+  | { type: "review-comments"; content: string; toolCallId: string }
+  | { type: "tool-result"; content: string; toolCallId: string };
 
 export type DiffItem = {
   type: "added" | "removed" | "context";
@@ -220,7 +233,10 @@ function printToolMessage(
     if (toolCall.toolName === "edit") {
       return format.formatEdit({
         type: "edit",
+        toolCallId: c.toolCallId,
         fileName: toolCall.args.fileName,
+        oldContent: toolCall.args.oldContent,
+        newContent: toolCall.args.newContent,
         content: formatDiff(toolCall.args.oldContent, toolCall.args.newContent),
       });
     }
@@ -228,6 +244,7 @@ function printToolMessage(
     if (toolCall.toolName === "read") {
       return format.formatRead({
         type: "read",
+        toolCallId: c.toolCallId,
         fileName: toolCall.args.fileName,
         content: stringResult,
       });
@@ -236,6 +253,7 @@ function printToolMessage(
     if (toolCall.toolName === "write") {
       return format.formatWrite({
         type: "write",
+        toolCallId: c.toolCallId,
         fileName: toolCall.args.fileName,
         content: toolCall.args.content,
       });
@@ -244,6 +262,7 @@ function printToolMessage(
     if (toolCall.toolName === "glob") {
       return format.formatGlob({
         type: "glob",
+        toolCallId: c.toolCallId,
         pattern: toolCall.args.pattern,
         content: stringResult,
       });
@@ -261,6 +280,7 @@ function printToolMessage(
 
       return format.formatRun({
         type: "run",
+        toolCallId: c.toolCallId,
         programme: toolCall.args.programme,
         args,
         result: stringResult,
@@ -270,6 +290,7 @@ function printToolMessage(
     if (toolCall.toolName === "ghPullReviewReviews") {
       return format.formatReviewComments({
         type: "review-comments",
+        toolCallId: c.toolCallId,
         content: stringResult,
       });
     }
@@ -280,6 +301,7 @@ function printToolMessage(
 
     format.formatToolResult({
       type: "tool-result",
+      toolCallId: c.toolCallId,
       content: stringResult,
     });
   });
