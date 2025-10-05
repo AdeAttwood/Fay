@@ -12,6 +12,10 @@ export default tool({
     try {
       const fileContent = await Deno.readTextFile(fileName);
       const newFileContent = fileContent.replace(oldContent, newContent);
+      if (fileContent === newFileContent) {
+        return "Error: edit has not been made, try reading the file again";
+      }
+
       await Deno.writeTextFile(fileName, newFileContent);
       return `Successfully edited ${fileName}`;
     } catch (error) {
