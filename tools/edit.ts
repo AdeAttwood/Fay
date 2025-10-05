@@ -3,7 +3,7 @@ import z from "zod";
 
 export default tool({
   description: "Edit a file by replacing a string with a new one.",
-  parameters: z.object({
+  inputSchema: z.object({
     fileName: z.string().describe("The filename of the file you want to edit."),
     oldContent: z.string().describe("The old string to be replaced."),
     newContent: z.string().describe("The new string to replace the old one."),
@@ -12,6 +12,10 @@ export default tool({
     try {
       const fileContent = await Deno.readTextFile(fileName);
       const newFileContent = fileContent.replace(oldContent, newContent);
+      if (fileContent === newFileContent) {
+        return "Error: edit has not been made, try reading the file again";
+      }
+
       await Deno.writeTextFile(fileName, newFileContent);
       return `Successfully edited ${fileName}`;
     } catch (error) {

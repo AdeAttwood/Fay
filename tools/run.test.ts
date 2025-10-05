@@ -1,10 +1,10 @@
 import { assertEquals } from "@std/assert";
-import run from "./run.ts";
+import run, { type inputSchema } from "./run.ts";
 import type z from "zod";
 import path from "node:path";
 
-async function runTool(parameters: z.infer<typeof run.parameters>) {
-  return await run.execute(
+async function runTool(parameters: z.infer<typeof inputSchema>) {
+  return await run.execute?.(
     parameters,
     { toolCallId: "run", messages: [] },
   );
@@ -23,7 +23,7 @@ Deno.test("Run Command in Subdirectory", async () => {
     cwd: subDir,
   });
 
-  assertEquals(result.trim(), subDir);
+  assertEquals((result as string).trim(), subDir);
 
   await Deno.remove(tempDir, { recursive: true });
 });

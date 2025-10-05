@@ -1,8 +1,16 @@
 {
-  "workspace": ["agent", "cli", "tools", "which"],
+  "workspace": [
+    "agent",
+    "cli",
+    "tools",
+    "which",
+    "stdio_server",
+    "agent_client_protocol",
+    "formatter"
+  ],
   "tasks": {
     "compile:cli": "deno compile --unstable-raw-imports --allow-run --allow-read --allow-write --allow-env --allow-net -o bin/fay ./cli/main.ts",
-    "preflight:test": "deno lint .",
+    "preflight:lint": "deno lint --unstable-raw-imports",
     "preflight:format": "deno fmt --check",
     "preflight:test": "deno test --allow-all",
     "preflight:compile": { "dependencies": ["compile:cli"] }

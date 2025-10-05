@@ -2,10 +2,16 @@ import { assert, assertEquals } from "@std/assert";
 import glob from "./glob.ts";
 
 async function runTool(pattern: string) {
-  return await glob.execute(
+  const res = await glob.execute?.(
     { pattern },
     { toolCallId: "run", messages: [] },
   );
+
+  if (typeof res === "string") {
+    return res;
+  }
+
+  return "";
 }
 
 Deno.test("glob tool should find files matching the pattern", async () => {

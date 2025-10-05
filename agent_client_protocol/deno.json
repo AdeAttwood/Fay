@@ -1,11 +1,9 @@
 {
-  "name": "@fay/tools",
+  "name": "@fay/agent_client_protocol",
   "version": "0.0.1",
   "exports": "./mod.ts",
   "imports": {
-    "@std/fs": "jsr:@std/fs@^1.0.18",
-    "ai": "npm:ai@^5.0.47",
-    "zod": "npm:zod@^3.25.64"
+    "@adeattwood/js-json-rpc": "npm:@adeattwood/js-json-rpc@^0.0.1"
   },
   "lint": {
     "rules": {

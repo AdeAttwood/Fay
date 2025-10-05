@@ -1,14 +1,12 @@
 import { Input } from "@cliffy/prompt";
+import { Select } from "@cliffy/prompt/select";
 import { Command } from "@cliffy/command";
 
-import { Agent } from "@fay/agent";
-import { SessionManager } from "./session-manager.ts";
-import { Configuration } from "../agent/config.ts";
-import {
-  consoleFormat,
-  formatMessage,
-  markdownFormat,
-} from "./formatter/index.ts";
+import { Agent, SessionManager } from "@fay/agent";
+import { Server } from "@fay/agent_client_protocol";
+import { AgentConfig, Configuration } from "../agent/config.ts";
+import { consoleFormat, formatMessage, markdownFormat } from "@fay/formatter";
+import { providers } from "../agent/provider.ts";
 
 const list = new Command()
   .description("List all the session you have available")
@@ -17,6 +15,29 @@ const list = new Command()
     for (const session of await sessions.list()) {
       console.log(session.id, session.title, `(${session.createdAt})`);
     }
+  });
+
+const model = new Command()
+  .description("List all available models")
+  .action(async () => {
+    const model = await Select.prompt({
+      message: "Choose a new model",
+      options: providers.map((p) => ({ name: p.display, value: p.id })),
+    });
+
+    let config: AgentConfig = {};
+    try {
+      config = JSON.parse(Deno.readTextFileSync("./.git/fay/fay.json"));
+    } catch {
+      config = {};
+    }
+
+    config.model = model;
+
+    Deno.writeTextFileSync(
+      "./.git/fay/fay.json",
+      JSON.stringify(config, undefined, 2),
+    );
   });
 
 const newCommand = new Command()
@@ -58,12 +79,8 @@ async function getInputFromEditor() {
 
 async function getPrompt(agent: Agent) {
   const input = await Input.prompt({
-    message: `Prompt input`,
-    suggestions: [
-      "/open",
-      "/system",
-      "/run",
-    ],
+    message: `Prompt input (${agent.config.config.model})`,
+    suggestions: ["/open", "/system", "/run"],
   });
 
   switch (input) {
@@ -89,7 +106,7 @@ async function getPrompt(agent: Agent) {
   return input;
 }
 
-async function getInitalPrompt(
+async function getInitialPrompt(
   agent: Agent,
   prompt: string | undefined,
   promptFile: string | undefined,
@@ -124,9 +141,9 @@ const run = new Command()
       formatMessage(message, agent.session.messages, consoleFormat);
     }
 
-    const initalPrompt = await getInitalPrompt(agent, prompt, promptFile);
-    if (initalPrompt) {
-      for await (const message of agent.prompt(initalPrompt)) {
+    const initialPrompt = await getInitialPrompt(agent, prompt, promptFile);
+    if (initialPrompt) {
+      for await (const message of agent.prompt(initialPrompt)) {
         formatMessage(message, agent.session.messages, consoleFormat);
       }
     }
@@ -150,11 +167,19 @@ const markdown = new Command()
     }
   });
 
+const stdio = new Command()
+  .description("Run the agent in stdio mode using the agent client protocol")
+  .action(async () => {
+    await new Server().run();
+  });
+
 await new Command()
   .name("fay")
   .default("run")
   .command("list", list)
+  .command("stdio", stdio)
   .command("new", newCommand)
   .command("md", markdown)
+  .command("model", model)
   .command("run", run)
   .parse(Deno.args);

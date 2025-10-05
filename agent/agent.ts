@@ -1,9 +1,11 @@
 import { Session } from "./session.ts";
 import { buildSystemPrompt } from "./prompt/index.ts";
 
-import { inferProviderFromEnvironment } from "./provider.ts";
+import { createProvider, inferProviderFromEnvironment } from "./provider.ts";
 import tools from "@fay/tools";
-import { type CoreMessage, type CoreUserMessage, streamText } from "ai";
+import { stepCountIs, streamText } from "ai";
+import { toInternalmessage, toModelMessage } from "./mapper.ts";
+import type { InternalMessage } from "./types.ts";
 import { Configuration } from "./config.ts";
 
 export type NewAgentOptions = {
@@ -35,6 +37,7 @@ export class Agent {
         new Date().getTime(),
         options.title,
         inferProviderFromEnvironment(config),
+        createProvider(inferProviderFromEnvironment(config)),
         [{ role: "system", content: buildSystemPrompt(config) }],
       ),
     );
@@ -50,7 +53,7 @@ export class Agent {
    * @returns A stream of messages from the agent.
    */
   public prompt = async function* prompt(this: Agent, content: string) {
-    const userMessage: CoreUserMessage = { role: "user", content };
+    const userMessage: InternalMessage = { role: "user", content };
     this.session.messages.push(userMessage);
 
     this.session.messages[0] = {
@@ -60,27 +63,22 @@ export class Agent {
 
     yield userMessage;
 
-    const messageQueue: Array<CoreMessage> = [];
+    const messageQueue: Array<InternalMessage> = [];
 
     const result = streamText({
       model: this.session.model,
-      messages: this.session.messages,
-      maxSteps: 1000,
-      maxTokens: 30000,
+      messages: this.session.messages.map(toModelMessage),
+
+      maxOutputTokens: 30000,
       tools,
-      toolCallStreaming: true,
+      stopWhen: stepCountIs(25),
       onStepFinish: (step) => {
         for (const message of step.response.messages) {
-          const existing = this.session.messages.find(
-            (m) => "id" in m && m.id == message.id,
-          );
+          const internalMessage = toInternalmessage(message);
+          this.session.messages.push(internalMessage);
+          this.saveSession();
 
-          if (!existing) {
-            this.session.messages.push(message);
-            this.saveSession();
-
-            messageQueue.push(message);
-          }
+          messageQueue.push(internalMessage);
         }
       },
       onFinish: () => {

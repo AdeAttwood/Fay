@@ -1,9 +1,9 @@
 import type {
-  CoreAssistantMessage,
-  CoreMessage,
-  CoreToolMessage,
-  UserContent,
-} from "ai";
+  InternalAssistantMessage,
+  InternalMessage,
+  InternalToolMessage,
+  InternalUserContent,
+} from "@fay/agent";
 import z from "zod";
 
 export type FormatItem =
@@ -18,12 +18,36 @@ export type FormatItem =
   | { type: "tool-result"; content: string };
 
 export type DiffItem = {
-  "type": "added" | "removed" | "context";
-  "content": string;
+  type: "added" | "removed" | "context";
+  content: string;
 };
 
 export interface Format {
-  write(type: FormatItem): void;
+  formatUserMessage: (
+    item: Extract<FormatItem, { type: "user-message" }>,
+  ) => void;
+
+  formatAssistantMessage: (
+    item: Extract<FormatItem, { type: "assistant-message" }>,
+  ) => void;
+
+  formatEdit: (item: Extract<FormatItem, { type: "edit" }>) => void;
+
+  formatRead: (item: Extract<FormatItem, { type: "read" }>) => void;
+
+  formatWrite: (item: Extract<FormatItem, { type: "write" }>) => void;
+
+  formatRun: (item: Extract<FormatItem, { type: "run" }>) => void;
+
+  formatGlob: (item: Extract<FormatItem, { type: "glob" }>) => void;
+
+  formatReviewComments: (
+    item: Extract<FormatItem, { type: "review-comments" }>,
+  ) => void;
+
+  formatToolResult: (
+    item: Extract<FormatItem, { type: "tool-result" }>,
+  ) => void;
 }
 
 const toolCallSchema = z.union([
@@ -58,10 +82,7 @@ const toolCallSchema = z.union([
     toolName: z.literal("run"),
     args: z.object({
       programme: z.string(),
-      args: z.union([
-        z.array(z.string()),
-        z.string(),
-      ]),
+      args: z.union([z.array(z.string()), z.string()]),
       cwd: z.string().optional(),
     }),
   }),
@@ -137,9 +158,12 @@ function formatDiff(oldText: string, newText: string): DiffItem[] {
   return output;
 }
 
-function printAssistantMessage(message: CoreAssistantMessage, format: Format) {
+function printAssistantMessage(
+  message: InternalAssistantMessage,
+  format: Format,
+) {
   if (typeof message.content === "string") {
-    return format.write({
+    return format.formatAssistantMessage({
       type: "assistant-message",
       content: message.content,
     });
@@ -147,7 +171,7 @@ function printAssistantMessage(message: CoreAssistantMessage, format: Format) {
 
   message.content.forEach((c) => {
     if (c.type === "text") {
-      return format.write({
+      return format.formatAssistantMessage({
         type: "assistant-message",
         content: c.text,
       });
@@ -155,12 +179,13 @@ function printAssistantMessage(message: CoreAssistantMessage, format: Format) {
   });
 }
 
-function getToolCall(id: string, messages: CoreMessage[]) {
+function getToolCall(id: string, messages: InternalMessage[]) {
   for (const message of messages) {
     if (message.role === "assistant") {
       for (const content of message.content) {
         if (
-          typeof content !== "string" && content.type === "tool-call" &&
+          typeof content !== "string" &&
+          content.type === "tool-call" &&
           content.toolCallId == id
         ) {
           return content;
@@ -171,8 +196,8 @@ function getToolCall(id: string, messages: CoreMessage[]) {
 }
 
 function printToolMessage(
-  message: CoreToolMessage,
-  messages: CoreMessage[],
+  message: InternalToolMessage,
+  messages: InternalMessage[],
   format: Format,
 ) {
   message.content.forEach((c) => {
@@ -193,7 +218,7 @@ function printToolMessage(
       : JSON.stringify(c.result || "", undefined, 2);
 
     if (toolCall.toolName === "edit") {
-      return format.write({
+      return format.formatEdit({
         type: "edit",
         fileName: toolCall.args.fileName,
         content: formatDiff(toolCall.args.oldContent, toolCall.args.newContent),
@@ -201,7 +226,7 @@ function printToolMessage(
     }
 
     if (toolCall.toolName === "read") {
-      return format.write({
+      return format.formatRead({
         type: "read",
         fileName: toolCall.args.fileName,
         content: stringResult,
@@ -209,7 +234,7 @@ function printToolMessage(
     }
 
     if (toolCall.toolName === "write") {
-      return format.write({
+      return format.formatWrite({
         type: "write",
         fileName: toolCall.args.fileName,
         content: toolCall.args.content,
@@ -217,7 +242,7 @@ function printToolMessage(
     }
 
     if (toolCall.toolName === "glob") {
-      return format.write({
+      return format.formatGlob({
         type: "glob",
         pattern: toolCall.args.pattern,
         content: stringResult,
@@ -234,7 +259,7 @@ function printToolMessage(
         }
       }
 
-      return format.write({
+      return format.formatRun({
         type: "run",
         programme: toolCall.args.programme,
         args,
@@ -243,7 +268,7 @@ function printToolMessage(
     }
 
     if (toolCall.toolName === "ghPullReviewReviews") {
-      return format.write({
+      return format.formatReviewComments({
         type: "review-comments",
         content: stringResult,
       });
@@ -253,14 +278,14 @@ function printToolMessage(
       return;
     }
 
-    format.write({
+    format.formatToolResult({
       type: "tool-result",
       content: stringResult,
     });
   });
 }
 
-function formatUserMessageContent(message: UserContent) {
+function formatUserMessageContent(message: InternalUserContent) {
   if (typeof message === "string") {
     return message;
   }
@@ -269,13 +294,13 @@ function formatUserMessageContent(message: UserContent) {
 }
 
 export function formatMessage(
-  message: CoreMessage,
-  messages: CoreMessage[],
+  message: InternalMessage,
+  messages: InternalMessage[],
   format: Format,
 ) {
   switch (message.role) {
     case "user":
-      return format.write({
+      return format.formatUserMessage({
         type: "user-message",
         content: formatUserMessageContent(message.content),
       });
