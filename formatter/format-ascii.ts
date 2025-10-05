@@ -1,4 +1,4 @@
-import type { Format, FormatItem } from "./index.ts";
+import type { Format, FormatItem } from "./mod.ts";
 import { colors } from "@cliffy/ansi/colors";
 
 const userHighlight = colors.yellow.bold;
@@ -44,10 +44,7 @@ export const consoleFormat: Format = {
   },
 
   formatRead(item: Extract<FormatItem, { type: "read" }>) {
-    console.log(
-      toolHighlight(`┃ READ:`),
-      item.fileName,
-    );
+    console.log(toolHighlight(`┃ READ:`), item.fileName);
     console.log(toolHighlight("┃"));
     for (const line of formatContent(item.content)) {
       console.log(toolHighlight("┃"), line);
@@ -56,10 +53,7 @@ export const consoleFormat: Format = {
   },
 
   formatWrite(item: Extract<FormatItem, { type: "write" }>) {
-    console.log(
-      toolHighlight(`┃ WRITE:`),
-      item.fileName,
-    );
+    console.log(toolHighlight(`┃ WRITE:`), item.fileName);
     console.log(toolHighlight("┃"));
     for (const line of formatContent(item.content)) {
       console.log(toolHighlight("┃"), line);
@@ -69,11 +63,7 @@ export const consoleFormat: Format = {
 
   formatRun(item: Extract<FormatItem, { type: "run" }>) {
     console.log(toolHighlight("┃"));
-    console.log(
-      toolHighlight("┃ RUN:"),
-      item.programme,
-      item.args.join(" "),
-    );
+    console.log(toolHighlight("┃ RUN:"), item.programme, item.args.join(" "));
     console.log(toolHighlight("┃"));
     for (const line of item.result.split("\n")) {
       console.log(toolHighlight("┃"), line);
