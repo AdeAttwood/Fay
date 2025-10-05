@@ -1,5 +1,6 @@
 import { google } from "@ai-sdk/google";
 import { anthropic } from "@ai-sdk/anthropic";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import type { Configuration } from "./config.ts";
 
 // http get https://models.dev/api.json | values | each { |provider|
@@ -46,6 +47,13 @@ export function createProvider(modelName: string) {
 
     case "anthropic":
       return anthropic(config.model);
+
+    case "opencode":
+      return createOpenAICompatible({
+        name: "opencode",
+        apiKey: Deno.env.get("OPENCODE_API_KEY"),
+        baseURL: "https://opencode.ai/zen/v1",
+      }).chatModel(config.model);
 
     default:
       throw new Error(`Model '${modelName}' is not configured correctly.`);
