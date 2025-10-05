@@ -5,7 +5,8 @@
     "tools",
     "which",
     "stdio_server",
-    "agent_client_protocol"
+    "agent_client_protocol",
+    "formatter"
   ],
   "tasks": {
     "compile:cli": "deno compile --unstable-raw-imports --allow-run --allow-read --allow-write --allow-env --allow-net -o bin/fay ./cli/main.ts",
