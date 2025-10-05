@@ -5,7 +5,7 @@ import z from "zod";
 export default tool({
   description:
     "Write data to a file, optionally at a specific offset and length",
-  parameters: z.object({
+  inputSchema: z.object({
     fileName: z.string().describe("The filename of the file you want to write"),
     content: z.string().describe("The content you want to write to the file"),
     offset: z.number().optional().describe(

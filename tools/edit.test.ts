@@ -5,7 +5,7 @@ Deno.test("edit tool", async () => {
   const testFile = await Deno.makeTempFile();
   await Deno.writeTextFile(testFile, "hello world");
 
-  const result = await edit.execute(
+  const result = await edit.execute?.(
     {
       fileName: testFile,
       oldContent: "world",
