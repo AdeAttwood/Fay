@@ -2,10 +2,16 @@ import { assertEquals } from "@std/assert";
 import read from "./read.ts";
 
 async function runTool(fileName: string) {
-  return await read.execute(
+  const res = await read.execute?.(
     { fileName },
     { toolCallId: "run", messages: [] },
   );
+
+  if (typeof res === "string") {
+    return res;
+  }
+
+  return "";
 }
 
 Deno.test("read tool should read file content", async () => {
