@@ -1,4 +1,4 @@
-import type { Format, FormatItem } from "./index.ts";
+import type { Format, FormatItem } from "./mod.ts";
 
 function details(
   summary: string,
@@ -37,15 +37,17 @@ export const markdownFormat: Format = {
   formatEdit(item: Extract<FormatItem, { type: "edit" }>) {
     details(
       "EDIT: " + item.fileName,
-      item.content.map((line) => {
-        if (line.type === "added") {
-          return "+ " + line.content;
-        } else if (line.type === "removed") {
-          return "- " + line.content;
-        } else {
-          return "  " + line.content;
-        }
-      }).join("\n"),
+      item.content
+        .map((line) => {
+          if (line.type === "added") {
+            return "+ " + line.content;
+          } else if (line.type === "removed") {
+            return "- " + line.content;
+          } else {
+            return "  " + line.content;
+          }
+        })
+        .join("\n"),
       "diff",
     );
   },

@@ -5,11 +5,7 @@ import { Command } from "@cliffy/command";
 import { Agent } from "@fay/agent";
 import { SessionManager } from "./session-manager.ts";
 import { type AgentConfig, Configuration } from "../agent/config.ts";
-import {
-  consoleFormat,
-  formatMessage,
-  markdownFormat,
-} from "./formatter/index.ts";
+import { consoleFormat, formatMessage, markdownFormat } from "@fay/formatter";
 import { providers } from "../agent/provider.ts";
 
 const list = new Command()
