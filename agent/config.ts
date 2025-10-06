@@ -33,14 +33,13 @@ export interface AgentConfig {
 }
 
 export class Configuration {
-  constructor(public readonly config: AgentConfig) {
+  constructor(public readonly config: AgentConfig) {}
+
+  public static find(baseDir: string = Deno.cwd()): Configuration {
+    return new Configuration(Configuration.configContent(baseDir));
   }
 
-  public static find(): Configuration {
-    return new Configuration(Configuration.configContent());
-  }
-
-  private static configContent(): AgentConfig {
+  private static configContent(baseDir: string = Deno.cwd()): AgentConfig {
     const home = Deno.env.get("HOME") || Deno.env.get("USERPROFILE");
     if (!home) {
       throw new Error(
@@ -55,8 +54,8 @@ export class Configuration {
       candidates.push(Deno.env.get("FAY_CONFIG")!);
     }
 
-    candidates.push(path.join(Deno.cwd(), ".git", "fay", "fay.json"));
-    candidates.push(path.join(Deno.cwd(), ".fay.json"));
+    candidates.push(path.join(baseDir, ".git", "fay", "fay.json"));
+    candidates.push(path.join(baseDir, ".fay.json"));
 
     if (Deno.env.has("APPDATA")) {
       candidates.push(path.join(Deno.env.get("APPDATA")!, "fay", "fay.json"));
