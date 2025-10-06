@@ -1,0 +1,13 @@
+{
+  "name": "@fay/agent_client_protocol",
+  "version": "0.0.1",
+  "exports": "./mod.ts",
+  "imports": {
+    "@adeattwood/js-json-rpc": "npm:@adeattwood/js-json-rpc@^0.0.1"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-slow-types"]
+    }
+  }
+}

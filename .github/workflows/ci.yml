@@ -23,7 +23,7 @@ jobs:
         run: deno fmt --check
 
       - name: Test
-        run: deno test --allow-all
+        run: deno test --allow-all --unstable-raw-imports
 
       - name: Compile
         run: deno task compile:cli
