@@ -16,6 +16,7 @@ import type { Configuration } from "./config.ts";
 // }
 // | flatten
 // | where provider == "google" or provider == "opencode" or provider == "anthropic"
+// | sort-by id
 // | to json
 // | save -f ./agent/providers.json
 import providersConfig from "./providers.json" with { type: "json" };
