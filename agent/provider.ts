@@ -1,4 +1,4 @@
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI, google } from "@ai-sdk/google";
 import { anthropic } from "@ai-sdk/anthropic";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import type { Configuration } from "./config.ts";
@@ -9,6 +9,7 @@ import type { Configuration } from "./config.ts";
 //       id: $"($provider.id)/($model.id)",
 //       provider: $provider.id,
 //       model: $model.id,
+//       npm: ($model | get -i provider.npm | default $provider.npm),
 //       display: $"($provider.name) / ($model.name)",
 //       cost: ($model | get -i cost | default {}),
 //     }
@@ -50,11 +51,24 @@ export function createProvider(modelName: string) {
       return anthropic(config.model);
 
     case "opencode":
-      return createOpenAICompatible({
-        name: "opencode",
-        apiKey: Deno.env.get("OPENCODE_API_KEY"),
-        baseURL: "https://opencode.ai/zen/v1",
-      }).chatModel(config.model);
+      switch (config.npm) {
+        case "@ai-sdk/openai-compatible":
+          return createOpenAICompatible({
+            name: "opencode",
+            apiKey: Deno.env.get("OPENCODE_API_KEY"),
+            baseURL: "https://opencode.ai/zen/v1",
+          }).chatModel(config.model);
+        case "@ai-sdk/google":
+          return createGoogleGenerativeAI({
+            apiKey: Deno.env.get("OPENCODE_API_KEY"),
+            baseURL: "https://opencode.ai/zen/v1",
+          }).chat(config.model);
+
+        default:
+          throw new Error(
+            `Model npm package '${modelName}' is not supported for opencode.`,
+          );
+      }
 
     default:
       throw new Error(`Model '${modelName}' is not configured correctly.`);
