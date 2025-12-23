@@ -55,6 +55,40 @@ Deno.test("Handles /agent/file resource link", () => {
   assertEquals("C:\\test.txt", result);
 });
 
+Deno.test("Handles file:// resource link", () => {
+  const result = buildMessageText(
+    {
+      log: (_: string) => {},
+    } as Context,
+    [
+      {
+        type: "resource_link",
+        name: "test.md (31:31)",
+        uri: "file:///D:/Code/src/github.com/AdeAttwood/Fay/test.md#L31:31",
+      },
+    ],
+  );
+
+  assertEquals("D:/Code/src/github.com/AdeAttwood/Fay/test.md#L31:31", result);
+});
+
+Deno.test("Handles file:// resource link without hash", () => {
+  const result = buildMessageText(
+    {
+      log: (_: string) => {},
+    } as Context,
+    [
+      {
+        type: "resource_link",
+        name: "journey-detection.md",
+        uri: "file:///D:/Code/src/github.com/AdeAttwood/Fay/test.md",
+      },
+    ],
+  );
+
+  assertEquals("D:/Code/src/github.com/AdeAttwood/Fay/test.md", result);
+});
+
 Deno.test("Handles unknown protocol resource link", () => {
   const result = buildMessageText(
     {
