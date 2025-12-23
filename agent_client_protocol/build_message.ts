@@ -22,6 +22,9 @@ export function buildMessageText(
       } else if (url.protocol == "zed:" && url.pathname == "/agent/selection") {
         const path = url.searchParams.get("path");
         if (path) message.push(path + url.hash);
+      } else if (url.protocol == "file:") {
+        const path = url.pathname.slice(1);
+        message.push(path + url.hash);
       } else {
         context.log(`Skipping unknown resource link ${JSON.stringify(block)}`);
       }

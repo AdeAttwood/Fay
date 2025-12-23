@@ -10,8 +10,19 @@ export default tool({
   }),
   execute: async ({ fileName, oldContent, newContent }) => {
     try {
-      const fileContent = await Deno.readTextFile(fileName);
-      const newFileContent = fileContent.replace(oldContent, newContent);
+      const fileContent = (await Deno.readTextFile(fileName)).replace(
+        "\r\n",
+        "\n",
+      );
+      if (!fileContent.includes(oldContent.replace("\r\n", "\n"))) {
+        return `Error: The newContent string is not in ${fileName}`;
+      }
+
+      const newFileContent = fileContent.replace(
+        oldContent.replace("\r\n", "\n"),
+        newContent.replace("\r\n", "\n"),
+      );
+
       if (fileContent === newFileContent) {
         return "Error: edit has not been made, try reading the file again";
       }

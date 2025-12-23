@@ -55,6 +55,48 @@ Deno.test("Handles /agent/file resource link", () => {
   assertEquals("C:\\test.txt", result);
 });
 
+Deno.test("Handles file:// resource link", () => {
+  const result = buildMessageText(
+    {
+      log: (_: string) => {},
+    } as Context,
+    [
+      {
+        type: "resource_link",
+        name: "journey-detection.md (31:31)",
+        uri:
+          "file:///D:/Code/src/github.com/Gl2Tech/FleetObserver/docs/services/archive/journey-detection.md#L31:31",
+      },
+    ],
+  );
+
+  assertEquals(
+    "D:/Code/src/github.com/Gl2Tech/FleetObserver/docs/services/archive/journey-detection.md#L31:31",
+    result,
+  );
+});
+
+Deno.test("Handles file:// resource link without hash", () => {
+  const result = buildMessageText(
+    {
+      log: (_: string) => {},
+    } as Context,
+    [
+      {
+        type: "resource_link",
+        name: "journey-detection.md",
+        uri:
+          "file:///D:/Code/src/github.com/Gl2Tech/FleetObserver/docs/services/archive/journey-detection.md",
+      },
+    ],
+  );
+
+  assertEquals(
+    "D:/Code/src/github.com/Gl2Tech/FleetObserver/docs/services/archive/journey-detection.md",
+    result,
+  );
+});
+
 Deno.test("Handles unknown protocol resource link", () => {
   const result = buildMessageText(
     {
