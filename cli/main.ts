@@ -78,8 +78,21 @@ async function getInputFromEditor() {
 }
 
 async function getPrompt(agent: Agent) {
+  const tokens = agent.session.messages.reduce((acc, message) => {
+    acc.input += message.usage?.inputTokens || 0;
+    acc.output += message.usage?.outputTokens || 0;
+    acc.total += message.usage?.totalTokens || 0;
+
+    return acc;
+  }, {
+    input: 0,
+    output: 0,
+    total: 0,
+  });
+
   const input = await Input.prompt({
-    message: `Prompt input (${agent.config.config.model})`,
+    message:
+      `Prompt input (${agent.config.config.model}) (${tokens.input}, ${tokens.output}, ${tokens.total})`,
     suggestions: ["/open", "/system", "/run"],
   });
 

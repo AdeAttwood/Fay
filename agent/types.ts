@@ -1,8 +1,16 @@
 export type InternalMessage =
-  | InternalUserMessage
-  | InternalAssistantMessage
-  | InternalToolMessage
-  | InternalSystemMessage;
+  | InternalUserMessage & MessageUsage
+  | InternalAssistantMessage & MessageUsage
+  | InternalToolMessage & MessageUsage
+  | InternalSystemMessage & MessageUsage;
+
+export type MessageUsage = {
+  usage?: {
+    inputTokens: number | undefined;
+    outputTokens: number | undefined;
+    totalTokens: number | undefined;
+  };
+};
 
 export type InternalUserContent = string | string[];
 
