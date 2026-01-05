@@ -75,7 +75,14 @@ export class Agent {
       onStepFinish: (step) => {
         for (const message of step.response.messages) {
           const internalMessage = toInternalmessage(message);
-          this.session.messages.push(internalMessage);
+          this.session.messages.push({
+            ...internalMessage,
+            usage: {
+              outputTokens: step.usage.outputTokens,
+              inputTokens: step.usage.inputTokens,
+              totalTokens: step.usage.totalTokens,
+            },
+          });
           this.saveSession();
 
           messageQueue.push(internalMessage);
