@@ -7,7 +7,7 @@
     "@ai-sdk/google": "npm:@ai-sdk/google@^2.0.14",
     "@ai-sdk/openai-compatible": "npm:@ai-sdk/openai-compatible@^1.0.18",
     "@std/fs": "jsr:@std/fs@^1.0.18",
-    "ai": "npm:ai@^5.0.47",
+    "ai": "npm:ai@^6.0.0",
     "zod": "npm:zod@^3.25.64"
   },
   "lint": {
